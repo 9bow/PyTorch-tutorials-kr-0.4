@@ -5,9 +5,9 @@ sphinx-sitemap
 numpy
 matplotlib
 torchvision
-torch
+torch==0.4.1
 
 # to run examples
 pandas
 scikit-image
-pillow
+git+https://github.com/python-pillow/Pillow@4.0.x
