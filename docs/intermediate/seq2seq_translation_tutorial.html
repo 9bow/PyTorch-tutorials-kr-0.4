@@ -1,499 +1,180 @@
 
 
+
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-    <link rel="canonical" href="http://tutorials.pytorch.kr/intermediate/seq2seq_translation_tutorial.html" />
   <meta charset="utf-8">
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Sequence to Sequence 네트워크와 Attention을 이용한 번역 &mdash; PyTorch Tutorials 0.4.1 documentation</title>
+  
 
-  <title>Sequence to Sequence 네트워크와 Attention을 이용한 번역 &mdash; PyTorch Tutorials 0.4.0 documentation</title>
+  
+  
+  
+  
+    <link rel="canonical" href="https://tutorials.pytorch.kr/intermediate/seq2seq_translation_tutorial.html"/>
+  
 
+  
 
+  
+  
+    
 
+  
 
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="강화 학습 (DQN) 튜토리얼" href="reinforcement_q_learning.html" />
+    <link rel="prev" title="문자-단위 RNN으로 이름 생성하기" href="char_rnn_generation_tutorial.html" /> 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-
-
-    <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-
-    <link rel="stylesheet" href="../_static/css/pytorch_theme.css" type="text/css" />
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css" />
-
-
-
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="PyTorch Tutorials 0.4.0 documentation" href="../index.html"/>
-        <link rel="next" title="강화 학습 (DQN) 튜토리얼" href="reinforcement_q_learning.html"/>
-        <link rel="prev" title="문자-단위 RNN으로 이름 생성하기" href="char_rnn_generation_tutorial.html"/>
-
-
+  
   <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/features">Features</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+          </li>
+
+          <li class="active">
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+
+  </div>
+</div>
 
 
-  <div class="wy-grid-for-nav">
+<body class="pytorch-body">
+
+   
+  <div>
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  0.4.1
+                </div>
+              
+            
+
+            
 
 
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-
-
-
-            <a href="../index.html" class="icon icon-home"> PyTorch Tutorials
-
-
-
-
-            <img src="../_static/pytorch-logo-dark.svg" class="logo" />
-
-          </a>
-
-
-
-
-              <div class="version">
-                0.4.0
-              </div>
-
-
+  
 
 
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search Tutorials" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
 
+            
+          </div>
 
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-
-
-
-
-
-
+          
+            
+            
+              
+            
+            
               <p class="caption"><span class="caption-text">Beginner Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/blitz/tensor_tutorial.html">PyTorch가 무엇인가요?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/tensor_tutorial.html#id1">시작하기</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/tensor_tutorial.html#tensors">Tensors</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/tensor_tutorial.html#operations">연산(Operations)</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/tensor_tutorial.html#numpy-bridge">NumPy 변환(Bridge)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/tensor_tutorial.html#torch-tensor-numpy">Torch Tensor를 NumPy 배열로 변환하기</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/tensor_tutorial.html#numpy-torch-tensor">NumPy 배열을 Torch Tensor로 변환하기</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/tensor_tutorial.html#cuda-tensors">CUDA Tensors</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/blitz/autograd_tutorial.html">Autograd: 자동 미분</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/autograd_tutorial.html#tensor">Tensor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/autograd_tutorial.html#gradient">변화도(Gradient)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/blitz/neural_networks_tutorial.html">신경망(Neural Networks)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/neural_networks_tutorial.html#id1">신경망 정의하기</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/neural_networks_tutorial.html#loss-function">손실 함수 (Loss Function)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/neural_networks_tutorial.html#backprop">역전파(Backprop)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/neural_networks_tutorial.html#id4">가중치 갱신</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html">분류기(Classifier) 학습하기</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html#id1">데이터는 어떻게 하나요?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html#id2">이미지 분류기 학습하기</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html#cifar10">1. CIFAR10를 불러오고 정규화하기</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html#convolution-neural-network">2. 합성곱 신경망(Convolution Neural Network) 정의하기</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html#optimizer">3. 손실 함수와 Optimizer 정의하기</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html#id3">4. 신경망 학습하기</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html#id4">5. 시험용 데이터로 신경망 검사하기</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html#gpu">GPU에서 학습하기</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html#id5">여러개의 GPU에서 학습하기</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html#id6">이제 뭘 해볼까요?</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html">Optional: Data Parallelism</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html#imports-and-parameters">Imports and parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html#dummy-dataset">Dummy DataSet</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html#simple-model">Simple Model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html#create-model-and-dataparallel">Create Model and DataParallel</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html#run-the-model">Run the Model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html#results">Results</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html#gpus">2 GPUs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html#id1">3 GPUs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html#id2">8 GPUs</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/blitz/data_parallel_tutorial.html#summary">Summary</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/former_torchies_tutorial.html">Torch 사용자를 위한 PyTorch</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/former_torchies/tensor_tutorial.html">Tensor</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/tensor_tutorial.html#in-place-out-of-place">In-place / Out-of-place</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/tensor_tutorial.html#zero-indexing">0-인덱스(Zero Indexing)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/tensor_tutorial.html#camel-case">카멜표기법(Camel Case) 없음</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/tensor_tutorial.html#numpy-bridge">NumPy 변환(Bridge)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/former_torchies/tensor_tutorial.html#torch-tensor-numpy">Torch Tensor를 NumPy 배열로 변환하기</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/former_torchies/tensor_tutorial.html#numpy-torch-tensor">NumPy 배열을 Torch Tensor로 변환하기</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/tensor_tutorial.html#cuda-tensors">CUDA Tensors</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/former_torchies/autograd_tutorial.html">Autograd</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/autograd_tutorial.html#history-track-tensor">이력(history)을 추적(track)하는 Tensor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/autograd_tutorial.html#gradient">변화도(Gradient)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/former_torchies/nn_tutorial.html">nn 패키지</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/nn_tutorial.html#convnet">예제1: 합성곱 신경망(ConvNet)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/nn_tutorial.html#hook">순방향/역방향 함수 훅(Hook)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/nn_tutorial.html#recurrent-nets">예제2: 순환 신경망(Recurrent Nets)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/former_torchies/parallelism_tutorial.html">멀티-GPU 예제</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/parallelism_tutorial.html#dataparallel">DataParallel</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/former_torchies/parallelism_tutorial.html#cpu-gpu">모델의 일부는 CPU, 일부는 GPU에서</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 PyTorch</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/pytorch_with_examples.html#tensor">Tensor</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#numpy">준비 운동: NumPy</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#pytorch-tensor">PyTorch: Tensor</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/pytorch_with_examples.html#autograd">Autograd</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#pytorch-tensor-autograd">PyTorch: Tensor와 autograd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#pytorch-autograd">PyTorch: 새 autograd 함수 정의하기</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#tensorflow-static-graph">TensorFlow: 정적 그래프(Static Graph)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/pytorch_with_examples.html#nn"><cite>nn</cite> 모듈</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#pytorch-nn">PyTorch: nn</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#pytorch-optim">PyTorch: optim</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#id3">PyTorch: 사용자 정의 nn 모듈</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#pytorch-control-flow-weight-sharing">PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/pytorch_with_examples.html#examples-download">예제 코드</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#id5">Tensor</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/examples_tensor/two_layer_net_numpy.html">준비 운동: NumPy</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/examples_tensor/two_layer_net_tensor.html">PyTorch: Tensor</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#id6">Autograd</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/examples_autograd/two_layer_net_autograd.html">PyTorch: Tensor와 autograd</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/examples_autograd/two_layer_net_custom_function.html">PyTorch: 새 autograd 함수 정의하기</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/examples_autograd/tf_two_layer_net.html">TensorFlow: 정적 그래프(Static Graph)</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/pytorch_with_examples.html#id7"><cite>nn</cite> 모듈</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/examples_nn/two_layer_net_nn.html">PyTorch: nn</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/examples_nn/two_layer_net_optim.html">PyTorch: optim</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/examples_nn/two_layer_net_module.html">PyTorch: 사용자 정의 nn 모듈</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/examples_nn/dynamic_net.html">PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">전이학습(Transfer Learning) 튜토리얼</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html#id2">데이터 불러오기</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html#id4">일부 이미지 시각화하기</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html#id5">모델 학습하기</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html#id6">모델 예측값 시각화하기</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html#finetuning">합성곱 신경망 미세조정(Finetuning)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html#id7">학습 및 평가하기</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html#id8">고정 특정 추출기로써의 합성곱 신경망</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html#id9">학습 및 평가하기</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/data_loading_tutorial.html">Data Loading and Processing Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/data_loading_tutorial.html#dataset-class">Dataset class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/data_loading_tutorial.html#transforms">Transforms</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/data_loading_tutorial.html#compose-transforms">Compose transforms</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/data_loading_tutorial.html#iterating-through-the-dataset">Iterating through the dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/data_loading_tutorial.html#afterword-torchvision">Afterword: torchvision</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_nlp_tutorial.html">Deep Learning for NLP with Pytorch</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/nlp/pytorch_tutorial.html">PyTorch 소개</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/pytorch_tutorial.html#torch-tensor">Torch의 텐서(Tensor) 라이브러리 소개</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/nlp/pytorch_tutorial.html#id1">텐서 생성하기</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/nlp/pytorch_tutorial.html#id2">텐서로 작업하기</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/nlp/pytorch_tutorial.html#id3">텐서 재구성</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/pytorch_tutorial.html#computation-graph-automatic-differentiation">연산 그래프(Computation Graph)와 자동 미분(Automatic Differentiation)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/nlp/deep_learning_tutorial.html">PyTorch를 이용한 딥러닝</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/deep_learning_tutorial.html#affine-maps">딥러닝 블록 구축 : 아핀 맵(affine maps), 비선형성, 객체</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/nlp/deep_learning_tutorial.html#id1">아핀 맵</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/nlp/deep_learning_tutorial.html#id2">비선형성</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/nlp/deep_learning_tutorial.html#softmax">Softmax 및 확률</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/nlp/deep_learning_tutorial.html#objective-functions">목적 함수(Objective Functions)</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/deep_learning_tutorial.html#id3">최적화와 학습</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/deep_learning_tutorial.html#id4">Pytorch 에서 네트워크 구성요소 생성하기</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../beginner/nlp/deep_learning_tutorial.html#bag-of-words">예제: 논리 회귀 Bag-of-Words 분류기</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/nlp/word_embeddings_tutorial.html">Word Embeddings: Encoding Lexical Semantics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/word_embeddings_tutorial.html#getting-dense-word-embeddings">Getting Dense Word Embeddings</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/word_embeddings_tutorial.html#word-embeddings-in-pytorch">Word Embeddings in Pytorch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/word_embeddings_tutorial.html#an-example-n-gram-language-modeling">An Example: N-Gram Language Modeling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/word_embeddings_tutorial.html#exercise-computing-word-embeddings-continuous-bag-of-words">Exercise: Computing Word Embeddings: Continuous Bag-of-Words</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/nlp/sequence_models_tutorial.html">Sequence Models and Long-Short Term Memory Networks</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/sequence_models_tutorial.html#lstm-s-in-pytorch">LSTM’s in Pytorch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/sequence_models_tutorial.html#example-an-lstm-for-part-of-speech-tagging">Example: An LSTM for Part-of-Speech Tagging</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/sequence_models_tutorial.html#exercise-augmenting-the-lstm-part-of-speech-tagger-with-character-level-features">Exercise: Augmenting the LSTM part-of-speech tagger with character-level features</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../beginner/nlp/advanced_tutorial.html">Advanced: Making Dynamic Decisions and the Bi-LSTM CRF</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/advanced_tutorial.html#dynamic-versus-static-deep-learning-toolkits">Dynamic versus Static Deep Learning Toolkits</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/advanced_tutorial.html#bi-lstm-conditional-random-field-discussion">Bi-LSTM Conditional Random Field Discussion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/advanced_tutorial.html#implementation-notes">Implementation Notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../beginner/nlp/advanced_tutorial.html#exercise-a-new-loss-function-for-discriminative-tagging">Exercise: A new loss function for discriminative tagging</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/former_torchies_tutorial.html">Torch 사용자를 위한 PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">전이학습(Transfer Learning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/data_loading_tutorial.html">Data Loading and Processing Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_nlp_tutorial.html">Deep Learning for NLP with Pytorch</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Intermediate Tutorials</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">문자-단위 RNN으로 이름 분류하기</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="char_rnn_classification_tutorial.html#id2">데이터 준비하기</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="char_rnn_classification_tutorial.html#tensor">이름을 Tensor 로 변경</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="char_rnn_classification_tutorial.html#id3">네트워크 생성</a></li>
-<li class="toctree-l2"><a class="reference internal" href="char_rnn_classification_tutorial.html#id4">학습</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="char_rnn_classification_tutorial.html#id5">학습 준비</a></li>
-<li class="toctree-l3"><a class="reference internal" href="char_rnn_classification_tutorial.html#id6">네트워크 학습</a></li>
-<li class="toctree-l3"><a class="reference internal" href="char_rnn_classification_tutorial.html#id7">결과 도식화</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="char_rnn_classification_tutorial.html#id8">결과 평가</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="char_rnn_classification_tutorial.html#id9">사용자 입력으로 실행</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="char_rnn_classification_tutorial.html#id10">연습</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">문자-단위 RNN으로 이름 생성하기</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="char_rnn_generation_tutorial.html#id2">데이터 준비하기</a></li>
-<li class="toctree-l2"><a class="reference internal" href="char_rnn_generation_tutorial.html#id4">네트워크 생성</a></li>
-<li class="toctree-l2"><a class="reference internal" href="char_rnn_generation_tutorial.html#id5">학습</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="char_rnn_generation_tutorial.html#id6">학습 준비</a></li>
-<li class="toctree-l3"><a class="reference internal" href="char_rnn_generation_tutorial.html#id7">네트워크 학습</a></li>
-<li class="toctree-l3"><a class="reference internal" href="char_rnn_generation_tutorial.html#id8">손실 도식화</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="char_rnn_generation_tutorial.html#id9">네트워크 샘플링</a></li>
-<li class="toctree-l2"><a class="reference internal" href="char_rnn_generation_tutorial.html#exercises">Exercises</a></li>
-</ul>
-</li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Sequence to Sequence 네트워크와 Attention을 이용한 번역</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id2">데이터 파일 로딩</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#seq2seq">Seq2Seq 모델</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id4">인코더</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id5">디코더</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id6">간단한 디코더</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id7">어텐션 디코더</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#id8">학습</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id9">학습 데이터 준비</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id10">모델 학습</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id11">결과 도식화</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#id12">평가</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id13">학습과 평가</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id14">어텐션 시각화</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#id15">연습</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reinforcement_q_learning.html#replay-memory">재현 메모리(Replay Memory)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reinforcement_q_learning.html#id2">DQN 알고리즘</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="reinforcement_q_learning.html#q">Q-네트워크</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reinforcement_q_learning.html#id3">입력 추출</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="reinforcement_q_learning.html#id4">학습</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="reinforcement_q_learning.html#id5">하이퍼 파라미터와 유틸리티</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reinforcement_q_learning.html#id8">학습 루프</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">Pytorch로 분산 어플리케이션 개발하기</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dist_tuto.html#setup">Setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dist_tuto.html#point-to-point-communication">지점간 통신(Point-to-Point Communication)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dist_tuto.html#collective-communication">집단 통신 (Collective Communication)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dist_tuto.html#distributed-training">분산 학습(Distributed Training)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dist_tuto.html#our-own-ring-allreduce">Our Own Ring-Allreduce</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dist_tuto.html#advanced-topics">Advanced Topics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dist_tuto.html#id2">통신 백엔드</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dist_tuto.html#id3">초기화 방법</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spatial_transformer_tutorial.html#id2">데이터 로딩</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spatial_transformer_tutorial.html#id3">공간 변형 네트워크 설명</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spatial_transformer_tutorial.html#id4">모델 학습</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spatial_transformer_tutorial.html#stn">STN 결과 시각화</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">문자-단위 RNN으로 이름 분류하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">문자-단위 RNN으로 이름 생성하기</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">Pytorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/neural_style_tutorial.html">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id2">소개</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id3">신경망 뭐라고?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id4">어떻게 동작합니까?</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id5">그래서. 어떻게 동작하냐고요?</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/neural_style_tutorial.html#pytorch">PyTorch 구현</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id6">패키지들</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#cuda">쿠다(CUDA)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id7">이미지 읽기</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id8">이미지 표시하기</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id9">콘텐츠 로스</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id10">스타일 로스</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id15">뉴럴 네트워크 읽기</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id16">입력 이미지</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/neural_style_tutorial.html#id17">경사 하강법</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/numpy_extensions_tutorial.html">Creating extensions using numpy and scipy</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/numpy_extensions_tutorial.html#parameter-less-example">Parameter-less example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/numpy_extensions_tutorial.html#parametrized-example">Parametrized example</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_caffe2.html">Transfering a model from PyTorch to Caffe2 and Mobile using ONNX</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/super_resolution_with_caffe2.html#transfering-srresnet-using-onnx">Transfering SRResNet using ONNX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/super_resolution_with_caffe2.html#running-the-model-on-mobile-devices">Running the model on mobile devices</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/cpp_extension.html#motivation-and-example">Motivation and Example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/cpp_extension.html#writing-a-c-extension">Writing a C++ Extension</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/cpp_extension.html#building-with-setuptools">Building with <code class="docutils literal notranslate"><span class="pre">setuptools</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/cpp_extension.html#writing-the-c-op">Writing the C++ Op</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../advanced/cpp_extension.html#forward-pass">Forward Pass</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../advanced/cpp_extension.html#backward-pass">Backward Pass</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/cpp_extension.html#binding-to-python">Binding to Python</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/cpp_extension.html#using-your-extension">Using Your Extension</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../advanced/cpp_extension.html#performance-comparison">Performance Comparison</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../advanced/cpp_extension.html#performance-on-gpu-devices">Performance on GPU Devices</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/cpp_extension.html#jit-compiling-extensions">JIT Compiling Extensions</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/cpp_extension.html#writing-a-mixed-c-cuda-extension">Writing a Mixed C++/CUDA extension</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../advanced/cpp_extension.html#integrating-a-c-cuda-operation-with-pytorch">Integrating a C++/CUDA Operation with PyTorch</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../advanced/cpp_extension.html#id2">Performance Comparison</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../advanced/cpp_extension.html#conclusion">Conclusion</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/neural_style_tutorial.html">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/numpy_extensions_tutorial.html">Creating extensions using numpy and scipy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_caffe2.html">Transfering a model from PyTorch to Caffe2 and Mobile using ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 </ul>
 
-
-
+            
+          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+    <div class="pytorch-container">
 
-
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">PyTorch Tutorials</a>
-
-      </nav>
-
-
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-
+      <section data-toggle="wy-nav-shift" class="pytorch-content-wrap">
+        <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+          <div class="pytorch-breadcrumbs-wrapper">
+            
 
 
 
@@ -511,30 +192,51 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
 
-  <ul class="wy-breadcrumbs">
-
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-
-      <li>Sequence to Sequence 네트워크와 Attention을 이용한 번역</li>
-
-
-      <li class="wy-breadcrumbs-aside">
-
-
-            <a href="../_sources/intermediate/seq2seq_translation_tutorial.rst.txt" rel="nofollow"> View page source</a>
-
-
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Tutorials
+          
+        </a> &gt;
       </li>
 
+        
+      <li>Sequence to Sequence 네트워크와 Attention을 이용한 번역</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/intermediate/seq2seq_translation_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
   </ul>
 
-
-  <hr/>
+  
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+          </div>
 
-  <div class="section" id="sequence-to-sequence-attention">
+          <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+            Shortcuts
+          </div>
+        </div>
+
+        <div class="pytorch-content-left">
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-intermediate-seq2seq-translation-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="sequence-to-sequence-attention">
 <span id="sphx-glr-intermediate-seq2seq-translation-tutorial-py"></span><h1>Sequence to Sequence 네트워크와 Attention을 이용한 번역<a class="headerlink" href="#sequence-to-sequence-attention" title="Permalink to this headline">¶</a></h1>
 <dl class="docutils">
 <dt><strong>Author</strong>: <a class="reference external" href="https://github.com/spro/practical-pytorch">Sean Robertson</a></dt>
@@ -776,14 +478,14 @@ ASCII로 변환하고, 모든 문자를 소문자로 만들고, 대부분의 구
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Reading</span> <span class="n">lines</span><span class="o">...</span>
-<span class="n">Read</span> <span class="mi">135842</span> <span class="n">sentence</span> <span class="n">pairs</span>
-<span class="n">Trimmed</span> <span class="n">to</span> <span class="mi">10853</span> <span class="n">sentence</span> <span class="n">pairs</span>
-<span class="n">Counting</span> <span class="n">words</span><span class="o">...</span>
-<span class="n">Counted</span> <span class="n">words</span><span class="p">:</span>
-<span class="n">fra</span> <span class="mi">4489</span>
-<span class="n">eng</span> <span class="mi">2925</span>
-<span class="p">[</span><span class="s1">&#39;vous etes grossiere .&#39;</span><span class="p">,</span> <span class="s1">&#39;you re rude .&#39;</span><span class="p">]</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Reading lines...
+Read 135842 sentence pairs
+Trimmed to 10853 sentence pairs
+Counting words...
+Counted words:
+fra 4489
+eng 2925
+[&#39;tu es trop confiante .&#39;, &#39;you re too trusting .&#39;]
 </pre></div>
 </div>
 </div>
@@ -1211,72 +913,72 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><a class="first reference internal image-reference" href="../_images/sphx_glr_seq2seq_translation_tutorial_001.png"><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_001.png" src="../_images/sphx_glr_seq2seq_translation_tutorial_001.png" style="width: 300.79999999999995px; height: 225.6px;" /></a>
+<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_001.png" class="sphx-glr-multi-img first" src="../_images/sphx_glr_seq2seq_translation_tutorial_001.png" />
 </li>
-<li><a class="first reference internal image-reference" href="../_images/sphx_glr_seq2seq_translation_tutorial_002.png"><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_002.png" src="../_images/sphx_glr_seq2seq_translation_tutorial_002.png" style="width: 300.79999999999995px; height: 225.6px;" /></a>
+<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_002.png" class="sphx-glr-multi-img first" src="../_images/sphx_glr_seq2seq_translation_tutorial_002.png" />
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="n">m</span> <span class="mi">9</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">16</span><span class="n">m</span> <span class="mi">9</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">5000</span> <span class="mi">6</span><span class="o">%</span><span class="p">)</span> <span class="mf">2.8825</span>
-<span class="mi">2</span><span class="n">m</span> <span class="mi">50</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">18</span><span class="n">m</span> <span class="mi">26</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">10000</span> <span class="mi">13</span><span class="o">%</span><span class="p">)</span> <span class="mf">2.3051</span>
-<span class="mi">5</span><span class="n">m</span> <span class="mi">19</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">21</span><span class="n">m</span> <span class="mi">16</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">15000</span> <span class="mi">20</span><span class="o">%</span><span class="p">)</span> <span class="mf">2.0186</span>
-<span class="mi">6</span><span class="n">m</span> <span class="mi">58</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">19</span><span class="n">m</span> <span class="mi">11</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">20000</span> <span class="mi">26</span><span class="o">%</span><span class="p">)</span> <span class="mf">1.7963</span>
-<span class="mi">9</span><span class="n">m</span> <span class="mi">4</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">18</span><span class="n">m</span> <span class="mi">8</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">25000</span> <span class="mi">33</span><span class="o">%</span><span class="p">)</span> <span class="mf">1.6120</span>
-<span class="mi">11</span><span class="n">m</span> <span class="mi">31</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">17</span><span class="n">m</span> <span class="mi">17</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">30000</span> <span class="mi">40</span><span class="o">%</span><span class="p">)</span> <span class="mf">1.4355</span>
-<span class="mi">13</span><span class="n">m</span> <span class="mi">47</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">15</span><span class="n">m</span> <span class="mi">46</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">35000</span> <span class="mi">46</span><span class="o">%</span><span class="p">)</span> <span class="mf">1.2854</span>
-<span class="mi">16</span><span class="n">m</span> <span class="mi">8</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">14</span><span class="n">m</span> <span class="mi">7</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">40000</span> <span class="mi">53</span><span class="o">%</span><span class="p">)</span> <span class="mf">1.1586</span>
-<span class="mi">18</span><span class="n">m</span> <span class="mi">36</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">12</span><span class="n">m</span> <span class="mi">24</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">45000</span> <span class="mi">60</span><span class="o">%</span><span class="p">)</span> <span class="mf">1.0600</span>
-<span class="mi">20</span><span class="n">m</span> <span class="mi">55</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">10</span><span class="n">m</span> <span class="mi">27</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">50000</span> <span class="mi">66</span><span class="o">%</span><span class="p">)</span> <span class="mf">0.9815</span>
-<span class="mi">23</span><span class="n">m</span> <span class="mi">21</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">8</span><span class="n">m</span> <span class="mi">29</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">55000</span> <span class="mi">73</span><span class="o">%</span><span class="p">)</span> <span class="mf">0.8803</span>
-<span class="mi">25</span><span class="n">m</span> <span class="mi">29</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">6</span><span class="n">m</span> <span class="mi">22</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">60000</span> <span class="mi">80</span><span class="o">%</span><span class="p">)</span> <span class="mf">0.8030</span>
-<span class="mi">27</span><span class="n">m</span> <span class="mi">58</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">4</span><span class="n">m</span> <span class="mi">18</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">65000</span> <span class="mi">86</span><span class="o">%</span><span class="p">)</span> <span class="mf">0.7381</span>
-<span class="mi">29</span><span class="n">m</span> <span class="mi">48</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">2</span><span class="n">m</span> <span class="mi">7</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">70000</span> <span class="mi">93</span><span class="o">%</span><span class="p">)</span> <span class="mf">0.6720</span>
-<span class="mi">31</span><span class="n">m</span> <span class="mi">57</span><span class="n">s</span> <span class="p">(</span><span class="o">-</span> <span class="mi">0</span><span class="n">m</span> <span class="mi">0</span><span class="n">s</span><span class="p">)</span> <span class="p">(</span><span class="mi">75000</span> <span class="mi">100</span><span class="o">%</span><span class="p">)</span> <span class="mf">0.6336</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1m 54s (- 26m 49s) (5000 6%) 2.8999
+3m 46s (- 24m 32s) (10000 13%) 2.3117
+5m 36s (- 22m 26s) (15000 20%) 2.0196
+7m 27s (- 20m 31s) (20000 26%) 1.7700
+9m 18s (- 18m 37s) (25000 33%) 1.5592
+11m 10s (- 16m 45s) (30000 40%) 1.4143
+13m 1s (- 14m 53s) (35000 46%) 1.2385
+14m 53s (- 13m 1s) (40000 53%) 1.1215
+16m 44s (- 11m 9s) (45000 60%) 1.0115
+18m 35s (- 9m 17s) (50000 66%) 0.9551
+20m 25s (- 7m 25s) (55000 73%) 0.8685
+22m 16s (- 5m 34s) (60000 80%) 0.7883
+24m 6s (- 3m 42s) (65000 86%) 0.7302
+25m 56s (- 1m 51s) (70000 93%) 0.6480
+27m 46s (- 0m 0s) (75000 100%) 0.6101
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">evaluateRandomly</span><span class="p">(</span><span class="n">encoder1</span><span class="p">,</span> <span class="n">attn_decoder1</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span>&gt; je n abandonne pas si facilement .
-= i m no quitter .
-&lt; i m no quitter . &lt;EOS&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; je vais a boston pour trois mois .
+= i m going to boston for three months .
+&lt; i m going to do the next for three .
 
-&gt; elle est extremement seduisante .
-= she is extremely attractive .
-&lt; she is extremely to cold . &lt;EOS&gt;
+&gt; je suis amoureux d une fille geniale .
+= i m in love with a wonderful girl .
+&lt; i m in a a in a wonderful . &lt;EOS&gt;
 
-&gt; vous etes si mechante .
-= you re so mean .
-&lt; you re so mean . &lt;EOS&gt;
+&gt; c est un flemmard .
+= he s a slob .
+&lt; he s a slob . &lt;EOS&gt;
 
-&gt; je suis amoureux de vous .
-= i m in love with you .
-&lt; i m in love with you . &lt;EOS&gt;
+&gt; vous n etes pas des notres .
+= you re not one of us .
+&lt; you re not one of us . &lt;EOS&gt;
 
-&gt; je ne suis pas une idiote .
-= i m no fool .
-&lt; i m not a thief . &lt;EOS&gt;
+&gt; vous commettez une grosse erreur .
+= you re making a big mistake .
+&lt; you re making a big mistake . &lt;EOS&gt;
 
-&gt; je suis encore endormie .
-= i m still sleepy .
-&lt; i m still sleepy . &lt;EOS&gt;
+&gt; je commence a avoir a nouveau sommeil .
+= i m getting sleepy again .
+&lt; i am beginning to feel a . &lt;EOS&gt;
 
-&gt; quel imbecile tu es !
-= you re such an idiot !
-&lt; you re such an idiot ! &lt;EOS&gt;
+&gt; je suis americain .
+= i am an american .
+&lt; i am an american . &lt;EOS&gt;
 
-&gt; elle dit qu elle voit des choses .
-= she says she is seeing things .
-&lt; she says she is seeing . &lt;EOS&gt;
+&gt; nous sommes tous a la pension .
+= we re all retired .
+&lt; we re all retired . &lt;EOS&gt;
 
-&gt; il est habile a trouver des pretextes .
-= he is clever at making excuses .
-&lt; he is quick at making at . &lt;EOS&gt;
+&gt; vous etes dur .
+= you re tough .
+&lt; you re tough . &lt;EOS&gt;
 
-&gt; ils sont chretiens .
-= they are christians .
-&lt; they re christians . &lt;EOS&gt;
+&gt; je n en peux plus des hamburgers .
+= i m sick and tired of hamburgers .
+&lt; i m sick of making people . &lt;EOS&gt;
 </pre></div>
 </div>
 <div class="section" id="id14">
@@ -1291,7 +993,7 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 <span class="n">plt</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">attentions</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 </pre></div>
 </div>
-<img alt="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" class="align-center" src="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" />
+<img alt="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" class="sphx-glr-single-img" src="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" />
 <p>더 나은 보기를 위해 축과 라벨을 더하는 추가 작업을 수행합니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">showAttention</span><span class="p">(</span><span class="n">input_sentence</span><span class="p">,</span> <span class="n">output_words</span><span class="p">,</span> <span class="n">attentions</span><span class="p">):</span>
     <span class="c1"># colorbar로 그림 설정</span>
@@ -1330,24 +1032,24 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><a class="first reference internal image-reference" href="../_images/sphx_glr_seq2seq_translation_tutorial_004.png"><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_004.png" src="../_images/sphx_glr_seq2seq_translation_tutorial_004.png" style="width: 300.79999999999995px; height: 225.6px;" /></a>
+<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_004.png" class="sphx-glr-multi-img first" src="../_images/sphx_glr_seq2seq_translation_tutorial_004.png" />
 </li>
-<li><a class="first reference internal image-reference" href="../_images/sphx_glr_seq2seq_translation_tutorial_005.png"><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_005.png" src="../_images/sphx_glr_seq2seq_translation_tutorial_005.png" style="width: 300.79999999999995px; height: 225.6px;" /></a>
+<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_005.png" class="sphx-glr-multi-img first" src="../_images/sphx_glr_seq2seq_translation_tutorial_005.png" />
 </li>
-<li><a class="first reference internal image-reference" href="../_images/sphx_glr_seq2seq_translation_tutorial_006.png"><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_006.png" src="../_images/sphx_glr_seq2seq_translation_tutorial_006.png" style="width: 300.79999999999995px; height: 225.6px;" /></a>
+<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_006.png" class="sphx-glr-multi-img first" src="../_images/sphx_glr_seq2seq_translation_tutorial_006.png" />
 </li>
-<li><a class="first reference internal image-reference" href="../_images/sphx_glr_seq2seq_translation_tutorial_007.png"><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_007.png" src="../_images/sphx_glr_seq2seq_translation_tutorial_007.png" style="width: 300.79999999999995px; height: 225.6px;" /></a>
+<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_007.png" class="sphx-glr-multi-img first" src="../_images/sphx_glr_seq2seq_translation_tutorial_007.png" />
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span> <span class="o">=</span> <span class="n">elle</span> <span class="n">a</span> <span class="n">cinq</span> <span class="n">ans</span> <span class="n">de</span> <span class="n">moins</span> <span class="n">que</span> <span class="n">moi</span> <span class="o">.</span>
-<span class="n">output</span> <span class="o">=</span> <span class="n">she</span> <span class="n">s</span> <span class="n">six</span> <span class="n">years</span> <span class="n">younger</span> <span class="n">than</span> <span class="n">me</span> <span class="o">.</span> <span class="o">&lt;</span><span class="n">EOS</span><span class="o">&gt;</span>
-<span class="nb">input</span> <span class="o">=</span> <span class="n">elle</span> <span class="n">est</span> <span class="n">trop</span> <span class="n">petit</span> <span class="o">.</span>
-<span class="n">output</span> <span class="o">=</span> <span class="n">she</span> <span class="n">s</span> <span class="n">too</span> <span class="n">short</span> <span class="o">.</span> <span class="o">&lt;</span><span class="n">EOS</span><span class="o">&gt;</span>
-<span class="nb">input</span> <span class="o">=</span> <span class="n">je</span> <span class="n">ne</span> <span class="n">crains</span> <span class="n">pas</span> <span class="n">de</span> <span class="n">mourir</span> <span class="o">.</span>
-<span class="n">output</span> <span class="o">=</span> <span class="n">i</span> <span class="n">m</span> <span class="ow">not</span> <span class="n">scared</span> <span class="n">of</span> <span class="n">dying</span> <span class="o">.</span> <span class="o">&lt;</span><span class="n">EOS</span><span class="o">&gt;</span>
-<span class="nb">input</span> <span class="o">=</span> <span class="n">c</span> <span class="n">est</span> <span class="n">un</span> <span class="n">jeune</span> <span class="n">directeur</span> <span class="n">plein</span> <span class="n">de</span> <span class="n">talent</span> <span class="o">.</span>
-<span class="n">output</span> <span class="o">=</span> <span class="n">he</span> <span class="n">s</span> <span class="n">a</span> <span class="n">talented</span> <span class="n">critic</span> <span class="n">s</span> <span class="n">loaded</span> <span class="o">.</span> <span class="o">&lt;</span><span class="n">EOS</span><span class="o">&gt;</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>input = elle a cinq ans de moins que moi .
+output = she s five years younger than me . &lt;EOS&gt;
+input = elle est trop petit .
+output = she is too short . &lt;EOS&gt;
+input = je ne crains pas de mourir .
+output = i m not scared of dying . &lt;EOS&gt;
+input = c est un jeune directeur plein de talent .
+output = he is a talented young . . &lt;EOS&gt;
 </pre></div>
 </div>
 </div>
@@ -1376,34 +1078,32 @@ embedding 을 교체하십시오</li>
 </ul>
 </li>
 </ul>
-<p><strong>Total running time of the script:</strong> ( 32 minutes  2.713 seconds)</p>
-<div class="sphx-glr-footer docutils container">
+<p><strong>Total running time of the script:</strong> ( 27 minutes  53.940 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-seq2seq-translation-tutorial-py">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" href="../_downloads/seq2seq_translation_tutorial.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">seq2seq_translation_tutorial.py</span></code></a></div>
+<a class="reference download internal" download="" href="../_downloads/3273d8aefb549d1c0ffff90f66f0cde9/seq2seq_translation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">seq2seq_translation_tutorial.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" href="../_downloads/seq2seq_translation_tutorial.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">seq2seq_translation_tutorial.ipynb</span></code></a></div>
+<a class="reference download internal" download="" href="../_downloads/158415ab1be5466cf6fa3f8d65613867/seq2seq_translation_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">seq2seq_translation_tutorial.ipynb</span></code></a></div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
 </div>
 
 
-           </div>
-           <div class="articleComments">
-
-           </div>
-          </div>
-          <footer>
-
+             </article>
+             
+            </div>
+            <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-
-        <a href="reinforcement_q_learning.html" class="btn btn-neutral float-right" title="강화 학습 (DQN) 튜토리얼" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-
-
-        <a href="char_rnn_generation_tutorial.html" class="btn btn-neutral" title="문자-단위 RNN으로 이름 생성하기" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-
+      
+        <a href="reinforcement_q_learning.html" class="btn btn-neutral float-right" title="강화 학습 (DQN) 튜토리얼" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="char_rnn_generation_tutorial.html" class="btn btn-neutral" title="문자-단위 RNN으로 이름 생성하기" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
     </div>
-
+  
 
   <hr/>
 
@@ -1413,25 +1113,60 @@ embedding 을 교체하십시오</li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
+          </div>
         </div>
-      </div>
 
-    </section>
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">Sequence to Sequence 네트워크와 Attention을 이용한 번역</a><ul>
+<li><a class="reference internal" href="#id2">데이터 파일 로딩</a></li>
+<li><a class="reference internal" href="#seq2seq">Seq2Seq 모델</a><ul>
+<li><a class="reference internal" href="#id4">인코더</a></li>
+<li><a class="reference internal" href="#id5">디코더</a><ul>
+<li><a class="reference internal" href="#id6">간단한 디코더</a></li>
+<li><a class="reference internal" href="#id7">어텐션 디코더</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">학습</a><ul>
+<li><a class="reference internal" href="#id9">학습 데이터 준비</a></li>
+<li><a class="reference internal" href="#id10">모델 학습</a></li>
+<li><a class="reference internal" href="#id11">결과 도식화</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id12">평가</a></li>
+<li><a class="reference internal" href="#id13">학습과 평가</a><ul>
+<li><a class="reference internal" href="#id14">어텐션 시각화</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id15">연습</a></li>
+</ul>
+</li>
+</ul>
 
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
+  
 
 
-
-
+  
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.4.0',
+            VERSION:'0.4.1',
+            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -1441,35 +1176,206 @@ embedding 을 교체하십시오</li>
       <script type="text/javascript" src="../_static/jquery.js"></script>
       <script type="text/javascript" src="../_static/underscore.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
+  
 
-
-
-
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-
-
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
-
+ 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-71919972-3', 'auto');
+  ga('create', 'UA-71919972-4', 'auto');
   ga('send', 'pageview');
 
 </script>
 
 
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://shiftlab.github.io/pytorch/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://shiftlab.github.io/pytorch/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/">PyTorch</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/features">Features</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/blog/">Blog</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/resources">Resources</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/support">Support</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Follow Us</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="#">Get Started</a>
+          </li>
+
+          <li>
+            <a href="#">Features</a>
+          </li>
+
+          <li>
+            <a href="#">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+          </li>
+
+          <li class="active">
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    mobileMenu.bind();
+    mobileTOC.bind();
+    pytorchAnchors.bind();
+
+    $(window).on("load", function() {
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+    })
+
+    // Add class to links that have code blocks, since we cannot create links in code blocks
+    $("article.pytorch-article a span.pre").each(function(e) {
+      $(this).closest("a").addClass("has-code");
+    });
+  </script>
 </body>
 </html>
