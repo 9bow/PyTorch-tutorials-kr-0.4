@@ -1,5 +1,7 @@
 # PyTorch 한국어 튜토리얼
 
+## **현재 이 저장소는 업데이트되지 않고 있습니다. 최신 버전은 [여기](https://9bow.github.io/PyTorch-tutorials-kr)에서 확인해주세요!**
+
 ## 소개
 
 PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소입니다.
